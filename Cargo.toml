@@ -1,8 +1,9 @@
 [package]
 name = "vecbool"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A simple implementation of a bit vector built on top of Vec<u8>"
 license = "MIT"
+repository = "https://github.com/mymatsubara/vecbool"
 
 [dependencies]
