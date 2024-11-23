@@ -169,6 +169,16 @@ impl From<VecBool> for Vec<bool> {
     }
 }
 
+impl From<VecBool> for Vec<u8> {
+    /// Basically unwraps [VecBool]
+    /// 
+    /// 
+    /// Preserving value beforehand from [VecBool::len()] method is recommended
+    fn from(value: VecBool) -> Self {
+        value.chunks
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
