@@ -145,6 +145,30 @@ impl VecBool {
     }
 }
 
+impl From<Vec<bool>> for VecBool {
+    fn from(value: Vec<bool>) -> Self {
+        let mut out = Self::with_capacity(value.len() / CHUNK_SIZE);
+
+        for v in value {
+            out.push(v);
+        };
+
+        out
+    }
+}
+
+impl From<VecBool> for Vec<bool> {
+    fn from(value: VecBool) -> Self {
+        let mut out = Self::with_capacity(value.len());
+
+        for i in 0..value.len() {
+            out.push(value.get(i).unwrap());
+        };
+
+        out
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -153,6 +177,15 @@ mod test {
     fn new() {
         let mask = VecBool::new();
         simple_test(mask);
+    }
+
+    #[test]
+    fn conversions() {
+        let v1: Vec<bool> = vec![true, true, false, true, false, false, true, false, false, true];
+        let v2 = VecBool::from(v1.clone());
+        let v3: Vec<bool> = Vec::from(v2);
+
+        assert_eq!(v1, v3);
     }
 
     #[test]
