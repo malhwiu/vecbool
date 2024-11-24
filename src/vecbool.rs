@@ -124,6 +124,33 @@ impl VecBool {
     }
 
     #[inline]
+    /// Unlike [VecBool::pop()], actually removes the last `bool` no matter where it is
+    /// 
+    /// More presice, but a bit more resourse intensive
+    pub fn pop_bit(&mut self) -> Option<bool> {
+        if self.len == 0 {
+            return None;
+        }
+
+        let data = self.get_unchecked(self.len - 1);
+
+        self.len -= 1;
+        let bit_position = self.len % CHUNK_SIZE;
+
+        if bit_position == 0 {
+            self.chunks.pop();
+        } else {
+            //let mask: u8 = 0xFF / bit_position.pow(2) as u8;
+            let mask: u8 = (0xFF as u8).overflowing_shl(bit_position as u32).0;
+            self.chunks[self.len / CHUNK_SIZE] &= !mask;
+        }
+
+        
+
+        Some(data)
+    }
+
+    #[inline]
     pub fn iter(&self) -> impl Iterator<Item = bool> + '_ {
         self.chunks
             .iter()
@@ -196,6 +223,21 @@ mod test {
         let v3: Vec<bool> = Vec::from(v2);
 
         assert_eq!(v1, v3);
+    }
+
+    #[test]
+    fn pop() {
+        let v1: Vec<bool> = vec![true, true, false, true, false, false, true, false, false, true, false];
+        let mut v2 = VecBool::from(v1.clone());
+
+        let result = v2.pop_bit().unwrap();
+        assert_eq!(result, v1[v1.len() - 1]);
+
+        let result = v2.pop_bit().unwrap();
+        assert_eq!(result, v1[v1.len() - 2]);
+
+        assert_eq!(9, v2.len());
+        assert_eq!(v2.get_unchecked(7), v1[v1.len() - 3])
     }
 
     #[test]
